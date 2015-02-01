@@ -13,7 +13,7 @@ A simple openroject docker image.
 
 First of all we need to build the image.
 
-    docker build -t linki/openproject-simple .
+    docker build -t linki/openproject:simple .
 
 Once that's done we can start a container from the image.
 But before running the rails app we need to prepare our database.
@@ -33,12 +33,12 @@ Let's migrate our database through our openproject image.
 
     docker run -it --rm --link postgres:database \
       -e DATABASE_URL=postgres://openproject:openproject@database:5432/openproject \
-      linki/openproject-simple bundle exec rake db:migrate
+      linki/openproject:simple bundle exec rake db:migrate
 
     docker run -it --rm --link postgres:database \
       -e DATABASE_URL=postgres://openproject:openproject@database:5432/openproject \
       -e RAILS_ENV=production -e SECRET_TOKEN=foobar \
-      linki/openproject-simple bundle exec rake db:seed
+      linki/openproject:simple bundle exec rake db:seed
 
 Note, that we run `rake db:seed` in the production environment, which results in a minimal seed.
 This is a little openproject detail and might be changed in the future.
@@ -48,12 +48,12 @@ This will add a lot of work packages with lorem ipsum style content.
 
     docker run -it --rm --link postgres:database \
       -e DATABASE_URL=postgres://openproject:openproject@database:5432/openproject \
-      linki/openproject-simple bundle exec rake db:seed
+      linki/openproject:simple bundle exec rake db:seed
 
 And then finally run the app server in the background.
 
     docker run -d -p 3000:3000 --link postgres:database \
-      -e DATABASE_URL=postgres://openproject:openproject@database:5432/openproject linki/openproject-simple
+      -e DATABASE_URL=postgres://openproject:openproject@database:5432/openproject linki/openproject:simple
 
 Voila, now browse to your docker host's ip address on port 3000.
 If you're using boot2docker you can probably use `boot2docker.me:3000`.
@@ -65,13 +65,13 @@ If you want to run it in production just pass the rails env and a secret token.
     docker run -d -p 3000:3000 --link postgres:database \
       -e DATABASE_URL=postgres://openproject:openproject@database:5432/openproject \
       -e RAILS_ENV=production -e SECRET_TOKEN=foobar \
-      linki/openproject-simple
+      linki/openproject:simple
 
 The worker process can be run in a separate container.
 
     docker run -d --link postgres:database \
       -e DATABASE_URL=postgres://openproject:openproject@database:5432/openproject \
-      linki/openproject-simple bundle exec rake jobs:work
+      linki/openproject:simple bundle exec rake jobs:work
 
 ## Fig
 
