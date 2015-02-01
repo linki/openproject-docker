@@ -1,0 +1,28 @@
+# a fig.yml that shows how each service can be configured
+#
+
+web:
+  build: .
+  command: bundle exec rails server --port 3000
+  environment:
+    RAILS_ENV: development
+    DATABASE_URL: postgres://openproject:openproject@database:5432/openproject
+  ports:
+    - "3000:3000"
+  links:
+    - postgres:database
+
+worker:
+  build: .
+  command: bundle exec rake jobs:work
+  environment:
+    RAILS_ENV: development
+    DATABASE_URL: postgres://openproject:openproject@database:5432/openproject
+  links:
+    - postgres:database
+
+postgres:
+  image: postgres:9.4
+  environment:
+    POSTGRES_USER: openproject
+    POSTGRES_PASSWORD: openproject

@@ -1,0 +1,8 @@
+# some gems that ease the way of building and runnign this image
+#
+
+# allow to provide an sqlite db at build time for asset precompilation
+gem 'sqlite3', '~> 1.3.0'
+
+# log to stdout and serve static assets through rails
+gem 'rails_12factor', '~> 0.0.3'
