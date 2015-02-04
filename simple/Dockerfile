@@ -58,6 +58,8 @@ RUN npm install --unsafe-perm
 #
 # openproject currently requires a database when compiling assets
 # we fake one by providing a sqlite db location for this command only
+#
+# also, asset precompiling needs to be done in production, otherwise icon images are missing
 RUN RAILS_ENV=production SECRET_TOKEN=foobar DATABASE_URL=sqlite3://db/ignore_me.sqlite3 \
   bundle exec rake assets:precompile
 
