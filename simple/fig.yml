@@ -5,8 +5,9 @@ web:
   build: .
   command: bundle exec rails server --port 3000
   environment:
-    RAILS_ENV: development
+    RAILS_ENV: production
     DATABASE_URL: postgres://openproject:openproject@database:5432/openproject
+    SECRET_TOKEN: foobar
   ports:
     - "3000:3000"
   links:
@@ -16,8 +17,9 @@ worker:
   build: .
   command: bundle exec rake jobs:work
   environment:
-    RAILS_ENV: development
+    RAILS_ENV: production
     DATABASE_URL: postgres://openproject:openproject@database:5432/openproject
+    SECRET_TOKEN: foobar
   links:
     - postgres:database
 
