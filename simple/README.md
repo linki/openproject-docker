@@ -4,10 +4,8 @@ A simple openroject docker image.
 
 ## Caveats
 
-* the example below runs in development mode because openproject's images aren't served correctly in production environment (ask @myabc)
 * no volume mounts for openproject files and postgres database (should work on linux, but didn't test)
 * no reverse-proxy for multiple app containers (therefore, no `fig scale`)
-* runs as root
 
 ## Usage
 
