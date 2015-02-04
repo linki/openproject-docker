@@ -48,11 +48,15 @@ RUN gem install bundler
 # install all ruby dependencies via bundler
 RUN bundle install
 
-# allow bower to run as root
-RUN sed -i -e "s/bower install/bower install --allow-root/g" /usr/src/openproject/frontend/package.json
+# create an openproject user that owns the code and will run the app server
+RUN useradd --comment openproject --home /home/openproject --create-home openproject
+RUN chown -R openproject:openproject /usr/src/openproject
+
+# switch to the openproject user from now on
+USER openproject
 
 # install all node dependencies via npm
-RUN npm install --unsafe-perm
+RUN npm install
 
 # precompile all assets
 #
