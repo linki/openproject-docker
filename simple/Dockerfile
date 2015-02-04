@@ -23,6 +23,7 @@ RUN apt-get -y install git-core
 #
 # the following installs ruby 2.1 via the apt package manager. unfortunately,
 # the default packages still only contain ruby 1.9, so we use brightbox's one.
+#
 RUN apt-get install -y software-properties-common python-software-properties
 RUN apt-add-repository -y ppa:brightbox/ruby-ng
 RUN apt-get update
@@ -64,6 +65,7 @@ RUN npm install
 # we fake one by providing a sqlite db location for this command only
 #
 # also, asset precompiling needs to be done in production, otherwise icon images are missing
+#
 RUN RAILS_ENV=production SECRET_TOKEN=foobar DATABASE_URL=sqlite3://db/ignore_me.sqlite3 \
   bundle exec rake assets:precompile
 
