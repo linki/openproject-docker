@@ -71,3 +71,21 @@ tbd.
 Bring openproject on a raspberry pi inside a container.
 
 tbd.
+
+## Kubernestes / Google Container Engine
+
+Looking forward to this.
+
+tbd.
+
+## Amazon ECS
+
+Hello World
+
+tbd.
+
+# Vulcand
+
+HAProxy? Vulcand!
+
+tbd.
