@@ -5,7 +5,13 @@ MAINTAINER Linki <linki+docker.com@posteo.de>
 RUN apt-get update
 
 # install build-essential because we need to compile some native extensions
-RUN apt-get -y install build-essential
+RUN apt-get install -y build-essential
+
+# install zlib development headers for nokogiri to build
+#
+# http://www.nokogiri.org/tutorials/installing_nokogiri.html
+#
+RUN apt-get install -y zlib1g-dev
 
 # we use a database for our backend, so let's add a couple of them
 RUN apt-get -y install libpq-dev libmysql++-dev sqlite3 libsqlite3-dev
@@ -16,7 +22,7 @@ RUN apt-get -y install nodejs npm
 # allow the nodejs binary to be called via node (this should be fixed somehow)
 RUN ln -s nodejs /usr/bin/node
 
-# install git in order to checkout openproject's source
+# install git in order to checkout gems defined by git urls
 RUN apt-get -y install git-core
 
 # install ruby 2.1
@@ -31,6 +37,12 @@ RUN apt-get update
 # install ruby 2.1 with development extensions
 RUN apt-get install -y ruby2.1 ruby2.1-dev
 
+# install our beloved bundler
+RUN gem install bundler
+
+# install foreman to run our app server at the end
+RUN gem install foreman
+
 # clone openproject's default branch
 RUN git clone --depth 1 https://github.com/opf/openproject.git /usr/src/openproject
 
@@ -43,18 +55,15 @@ COPY ./files/database.yml /usr/src/openproject/config/database.yml
 # add some gems specific to this image build
 COPY ./files/Gemfile.local /usr/src/openproject/Gemfile.local
 
-# install our beloved bundler
-RUN gem install bundler
-
-# install all ruby dependencies via bundler
-RUN bundle install
-
-# create an openproject user that owns the code and will run the app server
-RUN useradd --comment openproject --home /home/openproject --create-home openproject
+# create an unprivileged user that owns the code and will run the app server
+RUN useradd -m openproject
 RUN chown -R openproject:openproject /usr/src/openproject
 
 # switch to the openproject user from now on
 USER openproject
+
+# install all ruby dependencies via bundler into a local path
+RUN bundle install --path ./vendor/bundle
 
 # install all node dependencies via npm
 RUN npm install
@@ -62,18 +71,15 @@ RUN npm install
 # precompile all assets
 #
 # openproject currently requires a database when compiling assets
-# we fake one by providing a sqlite db location for this command only
+# we fake one by providing an sqlite db location for this command only
 #
-# also, asset precompiling needs to be done in production, otherwise icon images are missing
+# note, asset precompilation needs to be done in production, otherwise icon images are missing
 #
 RUN RAILS_ENV=production SECRET_TOKEN=foobar DATABASE_URL=sqlite3://db/ignore_me.sqlite3 \
   bundle exec rake assets:precompile
-
-# tell docker that we intend to mount something here
-VOLUME /usr/src/openproject/files
 
 # expose the app server's port
 EXPOSE 3000
 
 # launch the rails server unless another command is given
-CMD bundle exec rails server --port 3000
+CMD HOST=0.0.0.0 PORT=3000 foreman start web
