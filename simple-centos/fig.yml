@@ -1,0 +1,29 @@
+# a fig.yml that shows how each service can be configured
+#
+
+web:
+  build: .
+  environment:
+    RAILS_ENV: production
+    DATABASE_URL: postgres://openproject:openproject@db:5432/openproject
+    SECRET_TOKEN: foobar
+  ports:
+    - "3000:3000"
+  links:
+    - db
+
+worker:
+  build: .
+  command: foreman start worker
+  environment:
+    RAILS_ENV: production
+    DATABASE_URL: postgres://openproject:openproject@db:5432/openproject
+    SECRET_TOKEN: foobar
+  links:
+    - db
+
+db:
+  image: postgres:9.4
+  environment:
+    POSTGRES_USER: openproject
+    POSTGRES_PASSWORD: openproject
