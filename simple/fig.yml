@@ -27,3 +27,10 @@ db:
   environment:
     POSTGRES_USER: openproject
     POSTGRES_PASSWORD: openproject
+  volumes_from:
+    - data
+
+data:
+  image: busybox:latest
+  volumes:
+    - /var/lib/postgresql/data
