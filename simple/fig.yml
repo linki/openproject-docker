@@ -7,6 +7,7 @@ web:
     RAILS_ENV: production
     DATABASE_URL: postgres://openproject:openproject@db:5432/openproject
     SECRET_TOKEN: foobar
+    SESSION_STORE: active_record_store
   ports:
     - "3000:3000"
   links:
