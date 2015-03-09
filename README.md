@@ -15,13 +15,13 @@ In addition, usage of orchestration tools is highly welcome (speak `fig.yml`, fl
 
 Very basic openproject setup.
 
-Consists of a `postgres`, `web` and `worker` container. No mounted volumes for persistence.
+Consists of a `db`, `web` and `worker` container. In addition, it uses a data-only container for database persistence, and instructs OpenProject to use the database as session store so we stay logged in between container runs.
 
-* starts with a stock ubuntu image
-* adds various system dependencies through `apt-get`
+* starts with a stock image (ubuntu 14.04 or centos 7)
+* adds various system dependencies through `apt-get`/`yum`
 * checks out openproject from source
 * does bundler and npm magic
-* runs the default rails server
+* runs a single process via foreman (web or worker)
 
 ## Development
 
