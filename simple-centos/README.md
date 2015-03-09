@@ -4,7 +4,7 @@ A simple openroject docker image.
 
 ## Caveats
 
-* no volume mounts for openproject files and postgres database (should work on linux, but didn't test)
+* no volume mounts for openproject attachments (should work on linux, but didn't test)
 * no reverse-proxy for multiple app containers (therefore, no `fig scale`)
 
 ## Usage
