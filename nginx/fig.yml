@@ -1,0 +1,48 @@
+# a fig.yml that shows how each service can be configured
+#
+
+web:
+  image: nginx:1.7
+  ports:
+    - "8080:80"
+  links:
+    - app
+  volumes:
+    - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  volumes_from:
+    - app
+
+app:
+  image: linki/openproject:simple
+  environment:
+    RAILS_ENV: production
+    DATABASE_URL: postgres://openproject:openproject@db:5432/openproject
+    SECRET_TOKEN: foobar
+    SESSION_STORE: active_record_store
+  links:
+    - db
+  volumes:
+    - /usr/src/openproject/public
+
+worker:
+  image: linki/openproject:simple
+  command: foreman start worker
+  environment:
+    RAILS_ENV: production
+    DATABASE_URL: postgres://openproject:openproject@db:5432/openproject
+    SECRET_TOKEN: foobar
+  links:
+    - db
+
+db:
+  image: postgres:9.4
+  environment:
+    POSTGRES_USER: openproject
+    POSTGRES_PASSWORD: openproject
+  volumes_from:
+    - data
+
+data:
+  image: busybox:latest
+  volumes:
+    - /var/lib/postgresql/data
