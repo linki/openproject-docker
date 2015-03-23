@@ -1,0 +1,75 @@
+# a fig.yml that shows how each service can be configured
+#
+
+lb:
+  build: ./lb
+  links:
+    - consul
+  ports:
+    - "80:80"
+
+consul:
+  command: -server -bootstrap -advertise 10.0.2.15 # $ROUTABLE_IP 10.0.2.15 # routable IP from boot2docker’s eth0 interface
+  image: progrium/consul:latest
+  ports:
+    - "8300:8300"
+    - "8400:8400"
+    - "8500:8500"
+    - "8600:53/udp"
+
+registrator:
+  command: consul://consul:8500
+  image: progrium/registrator:latest
+  links:
+    - consul
+  volumes:
+    - "/var/run/docker.sock:/tmp/docker.sock"
+
+web:
+  image: nginx:1.7
+  environment:
+    SERVICE_80_NAME: http
+    SERVICE_NAME: web
+  ports:
+    - "80"
+  links:
+    - app
+  volumes:
+    - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  volumes_from:
+    - app
+
+app:
+  image: linki/openproject:simple
+  environment:
+    RAILS_ENV: production
+    DATABASE_URL: postgres://openproject:openproject@db:5432/openproject
+    SECRET_TOKEN: foobar
+    SESSION_STORE: active_record_store
+  links:
+    - db
+  volumes:
+    - /usr/src/openproject/public
+
+worker:
+  image: linki/openproject:simple
+  command: foreman start worker
+  environment:
+    RAILS_ENV: production
+    DATABASE_URL: postgres://openproject:openproject@db:5432/openproject
+    SECRET_TOKEN: foobar
+  links:
+    - db
+
+db:
+  image: postgres:9.4
+  environment:
+    POSTGRES_USER: openproject
+    POSTGRES_PASSWORD: openproject
+  volumes_from:
+    - data
+
+data:
+  image: busybox:latest
+  volumes:
+    - /var/lib/postgresql/data
