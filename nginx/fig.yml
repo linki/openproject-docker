@@ -22,7 +22,7 @@ app:
   links:
     - db
   volumes:
-    - /usr/src/openproject/public
+    - /app/public
 
 worker:
   image: linki/openproject:simple

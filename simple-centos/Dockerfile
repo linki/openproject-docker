@@ -42,23 +42,23 @@ RUN gem install bundler
 RUN gem install foreman
 
 # clone openproject's default branch
-RUN git clone --depth 1 https://github.com/opf/openproject.git /usr/src/openproject
+RUN git clone --depth 1 https://github.com/opf/openproject.git /app
 
 # set the working directory to the app
-WORKDIR /usr/src/openproject
+WORKDIR /app
 
 # use a database.yml that takes its values from an environment variables
-COPY ./files/database.yml /usr/src/openproject/config/database.yml
+COPY ./files/database.yml /app/config/database.yml
 
 # add some gems specific to this image build
-COPY ./files/Gemfile.local /usr/src/openproject/Gemfile.local
+COPY ./files/Gemfile.local /app/Gemfile.local
 
 # create an unprivileged user that owns the code and will run the app server
-RUN useradd -m openproject
-RUN chown -R openproject:openproject /usr/src/openproject
+RUN useradd -m app
+RUN chown -R app:app /app
 
 # switch to the openproject user from now on
-USER openproject
+USER app
 
 # install all ruby dependencies via bundler into a local path
 RUN bundle install --path ./vendor/bundle

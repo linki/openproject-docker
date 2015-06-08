@@ -40,6 +40,6 @@ data:
 
 attachments:
   image: busybox:latest
-  command: chown -R 1000:1000 /usr/src/openproject/files
+  command: chown -R 1000:1000 /app/files
   volumes:
-    - /usr/src/openproject/files
+    - /app/files
