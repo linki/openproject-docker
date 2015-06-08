@@ -12,6 +12,8 @@ web:
     - "3000:3000"
   links:
     - db
+  volumes_from:
+    - attachments
 
 worker:
   build: .
@@ -35,3 +37,9 @@ data:
   image: busybox:latest
   volumes:
     - /var/lib/postgresql/data
+
+attachments:
+  image: busybox:latest
+  command: chown -R 1000:1000 /usr/src/openproject/files
+  volumes:
+    - /usr/src/openproject/files
