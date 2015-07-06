@@ -30,6 +30,11 @@ FileUtils.chdir APP_ROOT do
     system "#{rake} db:migrate"
   end
 
+  # check whether we have pending migrations, if not we can skip migrations
+  # once we check in schema.rb we can move this call into the !fresh_database
+  # branch of the next if statement
+  pending_migrations = !system("#{rake} db:abort_if_pending_migrations")
+
   # normally, at this point we have a schema.rb and possibly an empty database
   # or a database pending some migrations. in case of a new database we run
   # db:setup, which will db:schema:load and then seed. for existing datbases
@@ -40,9 +45,15 @@ FileUtils.chdir APP_ROOT do
     # so far for the theory, db:setup doesn't work right now because we have
     # seed data in our migrations which would be missing. in order to move
     # forward, we do it the old way and hope we can use the line above soon.
-    system "#{rake} db:migrate"
-    system "#{rake} db:seed" # fresh databases need to be seeded
+    if pending_migrations
+      system "#{rake} db:migrate"
+    end
+
+    # fresh databases need to be seeded
+    system "#{rake} db:seed"
   else
-    system "#{rake} db:migrate"
+    if pending_migrations
+      system "#{rake} db:migrate"
+    end
   end
 end
