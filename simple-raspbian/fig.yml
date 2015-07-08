@@ -1,0 +1,59 @@
+# a fig.yml that shows how each service can be configured
+#
+
+web:
+  image: akkerman/rpi-nginx
+  ports:
+    - "80:80"
+  links:
+    - app
+  volumes:
+    - ./files/conf.d/:/etc/nginx/conf.d/:ro
+  volumes_from:
+    - app
+
+app:
+  build: .
+  environment:
+    RAILS_ENV: production
+    DATABASE_URL: postgres://postgres:postgres@db:5432/openproject?encoding=unicode&pool=5
+    SECRET_TOKEN: foobar
+    SESSION_STORE: active_record_store
+    OPENPROJECT_ATTACHMENTS__STORAGE__PATH: /var/lib/openproject/attachments
+  ports:
+    - "3000:3000"
+  links:
+    - db
+  volumes:
+    - /app/public
+  volumes_from:
+    - attachments
+
+worker:
+  build: .
+  command: foreman start worker
+  environment:
+    RAILS_ENV: production
+    DATABASE_URL: postgres://openproject:openproject@db:5432/openproject?encoding=unicode&pool=5
+    SECRET_TOKEN: foobar
+    OPENPROJECT_ATTACHMENTS__STORAGE__PATH: /var/lib/openproject/attachments
+  links:
+    - db
+  volumes_from:
+    - attachments
+
+attachments:
+  image: dduportal/rpi-busybox
+  command: chown -R 1000:1000 /var/lib/openproject/attachments
+  volumes:
+    - /var/lib/openproject/attachments
+
+db:
+  image: randyp/rpi-postgres
+  volumes_from:
+    - data
+
+data:
+  image: dduportal/rpi-busybox
+  volumes:
+    - /var/lib/postgresql/data
