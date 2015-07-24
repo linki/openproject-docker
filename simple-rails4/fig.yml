@@ -1,0 +1,45 @@
+# a fig.yml that shows how each service can be configured
+#
+
+web:
+  build: .
+  environment:
+    RAILS_ENV: production
+    DATABASE_URL: postgres://openproject:openproject@db:5432/openproject
+    SECRET_TOKEN: 74ac64cdf219539133cb1390a061b4f1e649642b75192db8c6898d0e73512e82887509dd6f7a17ce9acd192fcd728dae843d690748d0a44704659fa9a77f24ec
+    SESSION_STORE: active_record_store
+  ports:
+    - "3000:3000"
+  links:
+    - db
+  volumes_from:
+    - attachments
+
+worker:
+  build: .
+  command: foreman start worker
+  environment:
+    RAILS_ENV: production
+    DATABASE_URL: postgres://openproject:openproject@db:5432/openproject
+    SECRET_TOKEN: 74ac64cdf219539133cb1390a061b4f1e649642b75192db8c6898d0e73512e82887509dd6f7a17ce9acd192fcd728dae843d690748d0a44704659fa9a77f24ec
+  links:
+    - db
+
+db:
+  image: postgres:9.4
+  environment:
+    POSTGRES_USER: openproject
+    POSTGRES_PASSWORD: openproject
+  volumes_from:
+    - data
+
+data:
+  image: busybox:latest
+  volumes:
+    - /var/lib/postgresql/data
+
+attachments:
+  image: busybox:latest
+  command: chown -R 1000:1000 /app/files
+  volumes:
+    - /app/files
