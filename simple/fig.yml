@@ -17,7 +17,7 @@ web:
 
 worker:
   build: .
-  command: foreman start worker
+  command: sh -c 'sleep 60 && foreman start worker'
   environment:
     RAILS_ENV: production
     DATABASE_URL: postgres://openproject:openproject@db:5432/openproject

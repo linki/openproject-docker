@@ -46,6 +46,9 @@ COPY ./files/database.yml /app/config/database.yml
 # add some gems specific to this image build
 COPY ./files/Gemfile.local /app/Gemfile.local
 
+# a helper script to create/seed or migrate the database
+COPY ./files/setup_database /app/bin/setup_database
+
 # create an unprivileged user that owns the code and will run the app server
 RUN useradd -m app
 RUN chown -R app:app /app
@@ -72,5 +75,5 @@ RUN RAILS_ENV=production SECRET_TOKEN=foobar DATABASE_URL=sqlite3://db/ignore_me
 # expose the app server's port
 EXPOSE 3000
 
-# launch the rails server unless another command is given
-CMD HOST=0.0.0.0 PORT=3000 foreman start web
+# setup the database and launch the rails server unless another command is given
+CMD bin/setup_database && HOST=0.0.0.0 PORT=3000 foreman start web
